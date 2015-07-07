@@ -22,7 +22,7 @@ module Focuslight
       key = key_arg.to_sym
 
       value = params[key]
-      if spec.has_key?(:default) && value.nil?
+      if spec.has_key?(:default) && (value.nil? || value.strip.empty? && spec[:substitute_default_for_blank].is_a?(TrueClass))
         value = spec[:default]
       end
       if spec[:excludable] && value.nil?

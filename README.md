@@ -283,6 +283,9 @@ p result.hash       #=> {:v2=>100, :v3=>nil}
 - default
   - specify `String` value
   - default value when value is `nil`
+- substitute_default_for_blank
+  - specify `true` or `false`
+  - substitute value specified in `default` option for value if value is blank string
 - excludable
   - specify `true` or `false`
   - apply `nil` to result when value is `nil`

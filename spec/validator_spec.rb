@@ -16,6 +16,18 @@ describe Focuslight::Validator do
       expect(result.errors).to be_empty
       expect(result.hash).to eql({param1: 'param-01'})
 
+      result = Focuslight::Validator.validate({param2: ""}, {
+          param2: {
+            substitute_default_for_blank: true,
+            default: 'param-02',
+            rule: [ Focuslight::Validator.rule(:not_blank) ],
+          }
+        }
+      )
+      expect(result.has_error?).to be_falsey
+      expect(result.errors).to be_empty
+      expect(result.hash).to eql({param2: 'param-02'})
+
       result = Focuslight::Validator.validate(
         {key1: 'value10'}, # param
         {
@@ -40,6 +52,26 @@ describe Focuslight::Validator do
       Focuslight::Validator.validate_single(result, params, :key3, spec)
 
       expect(result[:key3]).to eql("0")
+    end
+
+    it 'returns substitute value as valid value for params with specified key has blank value' do
+      result = Focuslight::Validator::Result.new
+      params = {key1: "1", key2: "2", key3: "", key4: " "}
+      spec = {substitute_default_for_blank: true, default: "0", rule: Focuslight::Validator.rule(:not_blank)}
+      Focuslight::Validator.validate_single(result, params, :key3, spec)
+      Focuslight::Validator.validate_single(result, params, :key4, spec)
+
+      expect(result[:key3]).to eql("0")
+      expect(result[:key4]).to eql("0")
+    end
+
+    it 'does not return default value when value is valid even if specified `substitute_default_for_blank` option' do
+      result = Focuslight::Validator::Result.new
+      params = {key1: "1", key2: "2", key3: "3"}
+      spec = {substitute_default_for_blank: true, default: "0", rule: Focuslight::Validator.rule(:not_blank)}
+      Focuslight::Validator.validate_single(result, params, :key3, spec)
+
+      expect(result[:key3]).to eql("3")
     end
 
     it 'checks and formats about specified single key, that should have single value in params' do
